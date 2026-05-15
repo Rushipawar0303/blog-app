@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Cloud Blog Application</title>
+    <title>Online Blog Application</title>
 
     <style>
       body {
@@ -23,10 +23,22 @@
 
       button {
         padding: 10px 20px;
-        background: blue;
-        color: white;
-        border: none;
         margin-top: 10px;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+
+      .addbtn {
+        background: blue;
+      }
+
+      .editbtn {
+        background: orange;
+      }
+
+      .deletebtn {
+        background: red;
       }
 
       .post {
@@ -43,9 +55,9 @@
 
     <input type="text" id="title" placeholder="Enter Title" />
 
-    <textarea id="content" rows="5" placeholder="Write Blog Content"></textarea>
+    <textarea id="content" rows="5" placeholder="Write Content"></textarea>
 
-    <button onclick="addPost()">Add Post</button>
+    <button class="addbtn" onclick="addPost()">Add Post</button>
 
     <div id="posts"></div>
 
@@ -59,12 +71,26 @@
 
         postDiv.innerHTML = "";
 
-        posts.forEach((post) => {
+        posts.forEach((post, index) => {
           postDiv.innerHTML += `
-            <div class="post">
-                <h2>${post.title}</h2>
-                <p>${post.content}</p>
-            </div>
+
+        <div class="post">
+
+            <h2>${post.title}</h2>
+
+            <p>${post.content}</p>
+
+            <button class="editbtn"
+            onclick="editPost(${index})">
+            Edit
+            </button>
+
+            <button class="deletebtn"
+            onclick="deletePost(${index})">
+            Delete
+            </button>
+
+        </div>
         `;
         });
       }
@@ -87,10 +113,39 @@
           }),
         });
 
-        loadPosts();
-
         document.getElementById("title").value = "";
         document.getElementById("content").value = "";
+
+        loadPosts();
+      }
+
+      async function deletePost(id) {
+        await fetch(`/posts/${id}`, {
+          method: "DELETE",
+        });
+
+        loadPosts();
+      }
+
+      async function editPost(id) {
+        const newTitle = prompt("Enter new title");
+
+        const newContent = prompt("Enter new content");
+
+        await fetch(`/posts/${id}`, {
+          method: "PUT",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            title: newTitle,
+            content: newContent,
+          }),
+        });
+
+        loadPosts();
       }
 
       loadPosts();

@@ -11,17 +11,19 @@ app.use(express.static("public"));
 
 const FILE = "posts.json";
 
-// Get all blog posts
+// Get all posts
 app.get("/posts", (req, res) => {
   const data = fs.readFileSync(FILE);
+
   res.json(JSON.parse(data));
 });
 
-// Add new blog post
+// Add new post
 app.post("/posts", (req, res) => {
   const newPost = req.body;
 
   const data = fs.readFileSync(FILE);
+
   const posts = JSON.parse(data);
 
   posts.push(newPost);
@@ -29,7 +31,43 @@ app.post("/posts", (req, res) => {
   fs.writeFileSync(FILE, JSON.stringify(posts, null, 2));
 
   res.json({
-    message: "Post Added Successfully",
+    message: "Post Added",
+  });
+});
+
+// Update post
+app.put("/posts/:id", (req, res) => {
+  const id = req.params.id;
+
+  const updatedPost = req.body;
+
+  const data = fs.readFileSync(FILE);
+
+  const posts = JSON.parse(data);
+
+  posts[id] = updatedPost;
+
+  fs.writeFileSync(FILE, JSON.stringify(posts, null, 2));
+
+  res.json({
+    message: "Post Updated",
+  });
+});
+
+// Delete post
+app.delete("/posts/:id", (req, res) => {
+  const id = req.params.id;
+
+  const data = fs.readFileSync(FILE);
+
+  let posts = JSON.parse(data);
+
+  posts.splice(id, 1);
+
+  fs.writeFileSync(FILE, JSON.stringify(posts, null, 2));
+
+  res.json({
+    message: "Post Deleted",
   });
 });
 
